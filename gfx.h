@@ -10,10 +10,12 @@
 #define NUM_COLORS	256
 
 typedef unsigned char	byte;
+typedef unsigned short 	word;
 
 #define VGA 		((byte *)0xA0000000L) // Pointer to video
 
 void set_mode(byte mode);
 void put_pixel(int x, int y, int color);
+void draw_rect(int left, int top, int right, int bottom, byte color);
 
 #endif

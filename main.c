@@ -10,15 +10,8 @@ int main(void) {
 	int i, x, y, color;
 
 	set_mode(VGA_256_MODE);
-
-	for(i=0; i<32767; i++) {
-
-		x 	= rand()%SCREEN_WIDTH;
-		y 	= rand()%SCREEN_HEIGHT;
-		color 	= rand()%NUM_COLORS;
-
-		put_pixel(x, y, color);
-	}
+	
+	draw_rect(5, 5, 13, 45, 5);	
 
 	getch();
 	set_mode(TEXT_MODE);
