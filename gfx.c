@@ -1,6 +1,6 @@
-#include <dos.h>
-#include <mem.h>
 #include "gfx.h"
+
+unsigned char *double_buffer;
 
 void set_mode(unsigned char mode)
 {
@@ -10,11 +10,44 @@ void set_mode(unsigned char mode)
 	regs.h.al = mode;
 
 	int86(VIDEO_INT, &regs, &regs);
+
+	free(double_buffer); 
+}
+
+void init_buffer(void)
+{
+	double_buffer = (unsigned char *) malloc(320*200);
+
+	if( double_buffer==NULL ) {
+		printf("Not enough memory for double buffer.\n");
+		exit(1);
+	}
+}
+
+void end_buffer(void)
+{
+	clear_buffer();
+	free(double_buffer);
+}
+
+void clear_buffer(void)
+{
+	memset(&double_buffer[0],0,64000);
+}
+
+void sync_v(void)
+{
+	/* wait until done with vertical retrace */
+	while  ((inp(INPUT_STATUS) & VRETRACE));
+	/* wait until done refreshing */
+	while (!(inp(INPUT_STATUS) & VRETRACE));
+	/* copy double buffer to memory */
+	memcpy(VGA,double_buffer,320*200);
 }
 
 void put_pixel(int x, int y, int color)
 {
-	VGA[(y<<8) + (y<<6) + x] = color; // (256y) + (64y) + x
+	double_buffer[(y<<8) + (y<<6) + x] = color; // (256y) + (64y) + x
 }
 
 void draw_rect(int left, int top, int right, int bottom, byte color)
@@ -26,6 +59,6 @@ void draw_rect(int left, int top, int right, int bottom, byte color)
 	width		= right - left + 1;
 
 	for( i=top_offset; i<=bottom_offset; i+=SCREEN_WIDTH ) {
-		memset(&VGA[i],color,width);	
+		memset(&double_buffer[i],color,width);	
 	}
 }

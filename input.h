@@ -3,6 +3,8 @@
 
 #include <dos.h>
 
+#include "types.h"
+
 #define I_KEYBOARD	0x60
 
 #define KEY_UP		72

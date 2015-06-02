@@ -1,1 +1,1 @@
-bcc -ml -epong main.c gfx.c
+bcc -ml -epong main.c gfx.c input.c
