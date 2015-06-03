@@ -7,33 +7,49 @@
 #include "gfx.h"
 #include "input.h"
 
+#define PADDLE_WIDTH	8
+#define PADDLE_HEIGHT	40
+
+void clear_screen(void);
+void animate_ball(void);
+void draw_paddles(void);
+
+point ball_speed 	= { 2,2 };
+point ball_position 	= { SCREEN_WIDTH >> 1, SCREEN_HEIGHT >> 1 };
+point player_speed	= { 2,2 };
+point player_position	= { 10, 10 };
+point pc_speed		= { 2,2 };
+point pc_position	= { SCREEN_WIDTH - 18, SCREEN_HEIGHT - 50 };
+
 int main(void) {
 
-	struct point speed 	= { 1,1 };
-	struct point position 	= { SCREEN_WIDTH >> 1, SCREEN_HEIGHT >> 1 };
-
-	init_buffer();
+	int key = 0;
 
 	set_mode(VGA_256_MODE);
-
-	while(readKeyboard() != KEY_ESCAPE) {
+	init_buffer();	
 	
-		position.x += speed.x;
-		position.y += speed.y;
-
-		draw_rect( position.x - 1  , position.y - 1, position.x + 1, position.y + 1, 0xf);	
+	/* Game Loop */
+	while(readKeyboard() != KEY_ESCAPE) {
 		
-		if( position.x >= SCREEN_WIDTH || position.x <= 0 ) {
-			speed.x *= -1;
+		key = readKeyboard();
+		
+		if( key == KEY_DOWN ) {
+
+			// Going down
+
+		} else if( key == KEY_UP ) {
+		
+			// Going up
+
 		}
 
-		if( position.y >= SCREEN_HEIGHT || position.y <= 0 ) {
-			speed.y *= -1;
-		}
-		
+		draw_paddles();
+
+		animate_ball();
+				
 		sync_v();
 
-		clear_buffer();
+		clear_screen();
 	}
 
 	end_buffer();
@@ -41,5 +57,36 @@ int main(void) {
 	set_mode(TEXT_MODE);
 
 	return 0;
+
+}
+
+void clear_screen(void)
+{
+	draw_rect( ball_position.x - 1  , ball_position.y - 1, ball_position.x + 1, ball_position.y + 1, 0x0);
+	draw_rect( player_position.x, player_position.y, player_position.x + PADDLE_WIDTH, player_position.y + PADDLE_HEIGHT, 0xf );
+	draw_rect( pc_position.x, pc_position.y, pc_position.x + PADDLE_WIDTH, pc_position.y + PADDLE_HEIGHT, 0xf );
+}
+
+void animate_ball(void)
+{
+	ball_position.x += ball_speed.x;
+	ball_position.y += ball_speed.y;
+
+	draw_rect( ball_position.x - 1  , ball_position.y - 1, ball_position.x + 1, ball_position.y + 1, 0xf);	
+	
+	if( ball_position.x >= SCREEN_WIDTH - 2 || ball_position.x <= 2 ) {
+		ball_speed.x *= -1;
+	}
+
+	if( ball_position.y >= SCREEN_HEIGHT || ball_position.y <= 0 ) {
+		ball_speed.y *= -1;
+	}
+
+}
+
+void draw_paddles(void)
+{
+	draw_rect( player_position.x, player_position.y, player_position.x + PADDLE_WIDTH, player_position.y + PADDLE_HEIGHT, 0xf );
+	draw_rect( pc_position.x, pc_position.y, pc_position.x + PADDLE_WIDTH, pc_position.y + PADDLE_HEIGHT, 0xf );
 
 }

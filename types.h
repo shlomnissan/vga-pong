@@ -9,4 +9,6 @@ struct point {
 	int y;
 };
 
+typedef struct point point;
+
 #endif

@@ -26,8 +26,6 @@ void init_buffer(void);
 void end_buffer(void);
 void sync_v(void);
 void clear_buffer(void);
-void put_pixel(int x, int y, int color);
 void draw_rect(int left, int top, int right, int bottom, byte color);
-
 
 #endif
