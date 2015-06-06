@@ -27,17 +27,18 @@ int pc_speed		= 2;
 int main(void) {
 
 	int key 	= 0;
-	int temp 	= 0;
 
 	set_mode(VGA_256_MODE);
 	init_buffer();	
-	
+
+	key = readKeyboard();
+
 	/* Game Loop */
-	while(readKeyboard() != KEY_ESCAPE) {
+	while(key != KEY_ESCAPE) {
+
+		key = readKeyboard();			
 		
-		key = readKeyboard();
-		
-		if( key == KEY_DOWN ) {
+		if( key == KEY_DOWN_D ) {
 			
 			if( player_position.y <= SCREEN_HEIGHT - 12 - PADDLE_HEIGHT ) {
 				
@@ -45,7 +46,7 @@ int main(void) {
 
 			}
 
-		} else if( key == KEY_UP ) {
+		} else if( key == KEY_UP_D ) {
 		
 			if( player_position.y >= 12 ) {
 				
