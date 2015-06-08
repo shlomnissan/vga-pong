@@ -14,6 +14,7 @@ void clear_screen(void);
 void animate_ball(void);
 void draw_paddles(void);
 void collision_detection(void);
+void pc_ai(void);
 
 point ball_speed 	= { 2,2 };
 point ball_position 	= { SCREEN_WIDTH >> 1, SCREEN_HEIGHT >> 1 };
@@ -56,12 +57,12 @@ int main(void) {
 			
 		}
 
+		pc_ai();		
+
 		draw_paddles();
-
 		animate_ball();
-				
+		collision_detection();
 		sync_v();
-
 		clear_screen();
 	}
 
@@ -94,7 +95,6 @@ void animate_ball(void)
 	if( ball_position.y >= SCREEN_HEIGHT || ball_position.y <= 0 ) {
 		ball_speed.y *= -1;
 	}
-
 }
 
 void draw_paddles(void)
@@ -102,4 +102,64 @@ void draw_paddles(void)
 	draw_rect( player_position.x, player_position.y, player_position.x + PADDLE_WIDTH, player_position.y + PADDLE_HEIGHT, 0xf );
 	draw_rect( pc_position.x, pc_position.y, pc_position.x + PADDLE_WIDTH, pc_position.y + PADDLE_HEIGHT, 0xf );
 
+}
+
+void collision_detection(void)
+{
+
+	// Player
+	if( ball_position.x <= player_position.x + PADDLE_WIDTH && ball_position.y > player_position.y && ball_position.y < player_position.y + PADDLE_HEIGHT ) {
+		ball_position.x = player_position.x + PADDLE_WIDTH + 1;
+		ball_speed.x *= -1;
+	}
+
+	// Computer
+	if( ball_position.x + 1 >= pc_position.x && ball_position.y > pc_position.y && ball_position.y < pc_position.y + PADDLE_HEIGHT ) {
+		ball_position.x = pc_position.x - 1;
+		ball_speed.x *= -1;
+	}
+
+}
+
+void pc_ai(void)
+{
+	int pc_paddle_center = pc_position.y + (PADDLE_HEIGHT >> 1);
+
+	if( ball_speed.x < 0 ) {
+
+		// Go back to center of the screen
+		if( pc_paddle_center > (SCREEN_HEIGHT >> 1) + 1 ) {
+			pc_position.y -= pc_speed;
+		} else if( pc_paddle_center < (SCREEN_HEIGHT >> 1) - 1 ) {
+			pc_position.y += pc_speed;
+		}
+
+
+	} else {
+
+		// Predict
+		if( ball_position.y != pc_paddle_center ) {
+
+			if( ball_position.y < pc_paddle_center ) {
+				
+				if( pc_position.y > 10 ) {
+
+					pc_position.y -= pc_speed;						
+
+				}
+
+			} else {
+				
+				if( pc_position.y + PADDLE_HEIGHT <= SCREEN_HEIGHT - 10 ) { 
+
+					pc_position.y += pc_speed;
+
+				}
+
+			}
+
+		}
+
+	}
+		
 }
