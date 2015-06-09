@@ -5,8 +5,8 @@ typedef unsigned char	byte;
 typedef unsigned short 	word;
 
 struct point {
-	int x;
-	int y;
+	float x;
+	float y;
 };
 
 typedef struct point point;

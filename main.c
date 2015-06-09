@@ -7,8 +7,8 @@
 #include "gfx.h"
 #include "input.h"
 
-#define PADDLE_WIDTH	8
-#define PADDLE_HEIGHT	40
+#define PADDLE_WIDTH	5
+#define PADDLE_HEIGHT	30
 
 void clear_screen(void);
 void animate_ball(void);
@@ -16,18 +16,18 @@ void draw_paddles(void);
 void collision_detection(void);
 void pc_ai(void);
 
-point ball_speed 	= { 2,2 };
+point ball_speed 	= { 2, 2 };
 point ball_position 	= { SCREEN_WIDTH >> 1, SCREEN_HEIGHT >> 1 };
 point player_position	= { 10, 10 };
 point pc_position	= { SCREEN_WIDTH - 18, SCREEN_HEIGHT - 50 };
 
-int player_speed	= 2;
-int pc_speed		= 2;
+float player_speed	= 2;
+float pc_speed		= 1.8;
 
 
 int main(void) {
 
-	int key 	= 0;
+	int key = 0;
 
 	set_mode(VGA_256_MODE);
 	init_buffer();	
@@ -58,7 +58,6 @@ int main(void) {
 		}
 
 		pc_ai();		
-
 		draw_paddles();
 		animate_ball();
 		collision_detection();
@@ -125,41 +124,25 @@ void pc_ai(void)
 {
 	int pc_paddle_center = pc_position.y + (PADDLE_HEIGHT >> 1);
 
-	if( ball_speed.x < 0 ) {
+	if( ball_position.y != pc_paddle_center ) {
 
-		// Go back to center of the screen
-		if( pc_paddle_center > (SCREEN_HEIGHT >> 1) + 1 ) {
-			pc_position.y -= pc_speed;
-		} else if( pc_paddle_center < (SCREEN_HEIGHT >> 1) - 1 ) {
-			pc_position.y += pc_speed;
-		}
+		if( ball_position.y < pc_paddle_center ) {
+			
+			if( pc_position.y > 10 ) {
 
+				pc_position.y -= pc_speed;						
 
-	} else {
+			}
 
-		// Predict
-		if( ball_position.y != pc_paddle_center ) {
+		} else {
+			
+			if( pc_position.y + PADDLE_HEIGHT <= SCREEN_HEIGHT - 10 ) { 
 
-			if( ball_position.y < pc_paddle_center ) {
-				
-				if( pc_position.y > 10 ) {
-
-					pc_position.y -= pc_speed;						
-
-				}
-
-			} else {
-				
-				if( pc_position.y + PADDLE_HEIGHT <= SCREEN_HEIGHT - 10 ) { 
-
-					pc_position.y += pc_speed;
-
-				}
+				pc_position.y += pc_speed;
 
 			}
 
 		}
 
 	}
-		
 }
