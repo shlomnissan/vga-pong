@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <conio.h>
 #include <dos.h>
+#include <time.h>
 
 #include "types.h"
 #include "gfx.h"
@@ -18,12 +19,19 @@ void pc_ai(void);
 
 point ball_speed 	= { 2, 2 };
 point ball_position 	= { SCREEN_WIDTH >> 1, SCREEN_HEIGHT >> 1 };
-point player_position	= { 10, 10 };
-point pc_position	= { SCREEN_WIDTH - 18, SCREEN_HEIGHT - 50 };
+point player_position	= { 7, 10 };
+point pc_position	= { SCREEN_WIDTH - 12, SCREEN_HEIGHT - 50 };
 
 float player_speed	= 2;
 float pc_speed		= 1.8;
 
+int player_score	= 0;
+int pc_score	 	= 0;
+
+clock_t	begin;
+double 	time_spent;
+
+unsigned int reset = FALSE;
 
 int main(void) {
 
@@ -36,6 +44,19 @@ int main(void) {
 
 	/* Game Loop */
 	while(key != KEY_ESCAPE) {
+
+		if( reset == TRUE ) {
+			
+			time_spent = (double)(clock() - begin) / CLOCKS_PER_SEC;
+			
+			if( time_spent >= 1.0 ) {
+
+				time_spent = 0;
+				ball_position.x = SCREEN_WIDTH >> 1;
+				ball_position.y = SCREEN_HEIGHT >> 1;
+				reset = FALSE;
+			}
+		}
 
 		key = readKeyboard();			
 		
@@ -56,11 +77,15 @@ int main(void) {
 			}
 			
 		}
+		
+		if( reset == FALSE ) {
+			pc_ai();				
+			animate_ball();					
+		}
 
-		pc_ai();		
 		draw_paddles();
-		animate_ball();
 		collision_detection();
+
 		sync_v();
 		clear_screen();
 	}
@@ -68,6 +93,9 @@ int main(void) {
 	end_buffer();
 
 	set_mode(TEXT_MODE);
+
+	printf("Player score: %i\n", player_score);
+	printf("Computer score: %i", pc_score);
 
 	return 0;
 
@@ -88,7 +116,16 @@ void animate_ball(void)
 	draw_rect( ball_position.x - 1  , ball_position.y - 1, ball_position.x + 1, ball_position.y + 1, 0xf);	
 	
 	if( ball_position.x >= SCREEN_WIDTH - 2 || ball_position.x <= 2 ) {
-		ball_speed.x *= -1;
+		
+		if( ball_speed.x > 0 ) {
+			++player_score;
+		} else {
+			++pc_score;
+		}
+		
+		begin = clock();	
+
+		reset = TRUE;
 	}
 
 	if( ball_position.y >= SCREEN_HEIGHT || ball_position.y <= 0 ) {
