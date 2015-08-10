@@ -59,3 +59,101 @@ void draw_rect(int left, int top, int right, int bottom, byte color)
 		memset(&double_buffer[i],color,width);	
 	}
 }
+
+void load_bitmap(char *file, BITMAP *b) {
+
+	long 	index;
+	int 	x;
+	FILE 	*fp;
+	word 	num_colors;
+
+	if ( (fp = fopen(file, "rb")) == NULL ) {
+		
+		printf("Error opening file %s.\n", file);
+		exit(1);
+
+	}
+
+	if ( fgetc(fp) != 'B' || fgetc(fp) != 'M' ) {
+		
+		fclose(fp);
+		printf("%s is not a bitmap file.\n");
+		exit(1);
+
+	}
+
+	fskip(fp,16);
+	fread(&b->width, sizeof(word), 1, fp);
+
+	fskip(fp, 2);
+	fread(&b->height, sizeof(word), 1, fp);
+
+	fskip(fp, 22);
+	fread(&num_colors, sizeof(word), 1, fp);
+
+	fskip(fp, 6);
+
+	if( num_colors == 0 ) {
+		
+		num_colors = 256;
+
+	}
+
+	// allocate the memory
+  if( (b->data = (byte *)malloc( (word)( b->width * b->height ) ) ) == NULL ) {
+
+    fclose(fp);
+    printf("Error allocating memory for file %s.\n",file);
+    exit(1);
+
+  }
+
+  // read the palette
+  for( index = 0; index < num_colors; index++ ) {
+
+    b->palette[(int)(index*3+2)] = fgetc(fp) >> 2;
+    b->palette[(int)(index*3+1)] = fgetc(fp) >> 2;
+    b->palette[(int)(index*3+0)] = fgetc(fp) >> 2;
+
+    x = fgetc(fp);
+
+  }
+
+  // read the bitmap
+  for( index = (b->height - 1) * b->width; index >= 0; index -= b->width ) {
+
+    for( x=0; x<b->width; x++ ) {
+
+      b->data[(word)index+x] = (byte)fgetc(fp);
+
+    }
+
+  }
+
+  fclose(fp);
+
+}
+
+void set_palette(byte *palette) {
+
+	int i;
+
+	outp(0x03c8, 0);
+
+	for( i=0; i<256*3; i++ ) {
+
+		outp(0x03c9, palette[i]);
+
+	}
+
+}
+
+void fskip(FILE *fp, int num_bytes) {
+
+  int i;
+
+  for( i=0; i<num_bytes; i++ ) {
+    fgetc(fp);
+  }
+
+}

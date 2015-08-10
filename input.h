@@ -12,6 +12,7 @@
 #define KEY_DOWN_D	80
 #define KEY_DOWN_R	208
 #define KEY_ESCAPE	1
+#define SPACE_BAR	185
 
 int readKeyboard(void);
 

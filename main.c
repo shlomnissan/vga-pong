@@ -16,17 +16,21 @@ void animate_ball(void);
 void draw_paddles(void);
 void collision_detection(void);
 void pc_ai(void);
+void logo_screen(void);
+void game_loop(void);
 
-point ball_speed 	= { 2, 2 };
+point ball_speed 		= { 2, 2 };
 point ball_position 	= { SCREEN_WIDTH >> 1, SCREEN_HEIGHT >> 1 };
 point player_position	= { 7, 10 };
-point pc_position	= { SCREEN_WIDTH - 12, SCREEN_HEIGHT - 50 };
+point pc_position		= { SCREEN_WIDTH - 12, SCREEN_HEIGHT - 50 };
 
 float player_speed	= 2;
 float pc_speed		= 1.8;
 
 int player_score	= 0;
 int pc_score	 	= 0;
+int game_state		= 0;
+int key 			= 0;
 
 clock_t	begin;
 double 	time_spent;
@@ -34,8 +38,6 @@ double 	time_spent;
 unsigned int reset = FALSE;
 
 int main(void) {
-
-	int key = 0;
 
 	set_mode(VGA_256_MODE);
 	init_buffer();	
@@ -45,49 +47,24 @@ int main(void) {
 	/* Game Loop */
 	while(key != KEY_ESCAPE) {
 
-		if( reset == TRUE ) {
-			
-			time_spent = (double)(clock() - begin) / CLOCKS_PER_SEC;
-			
-			if( time_spent >= 1.0 ) {
+		switch( game_state ) {
 
-				time_spent = 0;
-				ball_position.x = SCREEN_WIDTH >> 1;
-				ball_position.y = SCREEN_HEIGHT >> 1;
-				reset = FALSE;
-			}
+			case 0:
+
+				logo_screen();
+
+				break;
+
+			case 1:
+
+				game_loop();
+
+				break;
+
 		}
 
-		key = readKeyboard();			
-		
-		if( key == KEY_DOWN_D ) {
-			
-			if( player_position.y <= SCREEN_HEIGHT - 12 - PADDLE_HEIGHT ) {
-				
-				player_position.y += player_speed;					
+		key = readKeyboard();
 
-			}
-
-		} else if( key == KEY_UP_D ) {
-		
-			if( player_position.y >= 12 ) {
-				
-				player_position.y -= player_speed;					
-
-			}
-			
-		}
-		
-		if( reset == FALSE ) {
-			pc_ai();				
-			animate_ball();					
-		}
-
-		draw_paddles();
-		collision_detection();
-
-		sync_v();
-		clear_screen();
 	}
 
 	end_buffer();
@@ -98,6 +75,70 @@ int main(void) {
 	printf("Computer score: %i", pc_score);
 
 	return 0;
+
+}
+
+void logo_screen(void)
+{
+
+	key = readKeyboard();
+	gotoxy(7,13);
+	printf("PRESS THE SPACE BAR TO START");
+
+	if( key == SPACE_BAR ) {
+
+		game_state = 1;
+
+	}
+
+}
+
+void game_loop(void)
+{
+
+	if( reset == TRUE ) {
+		
+		time_spent = (double)(clock() - begin) / CLOCKS_PER_SEC;
+		
+		if( time_spent >= 1.0 ) {
+
+			time_spent = 0;
+			ball_position.x = SCREEN_WIDTH >> 1;
+			ball_position.y = SCREEN_HEIGHT >> 1;
+			reset = FALSE;
+		}
+	}
+
+	key = readKeyboard();			
+	
+	if( key == KEY_DOWN_D ) {
+		
+		if( player_position.y <= SCREEN_HEIGHT - 12 - PADDLE_HEIGHT ) {
+			
+			player_position.y += player_speed;					
+
+		}
+
+	} else if( key == KEY_UP_D ) {
+	
+		if( player_position.y >= 12 ) {
+			
+			player_position.y -= player_speed;					
+
+		}
+		
+	}
+	
+	if( reset == FALSE ) {
+		pc_ai();				
+		animate_ball();					
+	}
+
+	draw_paddles();
+	collision_detection();
+
+	sync_v();
+	clear_screen();
 
 }
 

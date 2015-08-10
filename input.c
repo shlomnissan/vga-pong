@@ -7,12 +7,20 @@ int readKeyboard(void)
 	int key = inportb(I_KEYBOARD);
 	outportb(0x20, 0x20); // Signals 8259 in PC that interrupt has been processed
 	
+	if( key == SPACE_BAR ) {
+
+		return SPACE_BAR;
+
+	}
+
 	if( key < 128 ) {
 	
 		keys[key] = 1;
-		
+
 		if( key == KEY_ESCAPE || key == KEY_UP_D || key == KEY_DOWN_D ) {
+			
 			return key;
+
 		}
 
 	} else {
