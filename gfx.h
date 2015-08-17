@@ -24,7 +24,6 @@ typedef struct tagBitmap {
 
 	word width;
 	word height;
-	byte palette[256*3];
 	byte *data;
 
 }BITMAP;
@@ -36,6 +35,7 @@ void sync_v(void);
 void clear_buffer(void);
 void draw_rect(int left, int top, int right, int bottom, byte color);
 void load_bitmap(char *file, BITMAP *b);
+void draw_bitmap(BITMAP *bitmap, int x, int y);
 void set_palette(byte *palette);
 void fskip(FILE *fp, int num_bytes);
 

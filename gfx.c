@@ -51,14 +51,19 @@ void draw_rect(int left, int top, int right, int bottom, byte color)
 {
 	word top_offset, bottom_offset, width, i;
 
-	top_offset 	= (top<<8) + (top<<6) + left;
+	top_offset 		= (top<<8) + (top<<6) + left;
 	bottom_offset 	= (bottom<<8) + (bottom<<6) + left;
-	width		= right - left + 1;
+	width			= right - left + 1;
 
 	for( i=top_offset; i<=bottom_offset; i+=SCREEN_WIDTH ) {
-		memset(&double_buffer[i],color,width);	
+
+		memset(&double_buffer[i],color,width);
+	
 	}
+
 }
+
+/*
 
 void load_bitmap(char *file, BITMAP *b) {
 
@@ -131,6 +136,23 @@ void load_bitmap(char *file, BITMAP *b) {
   }
 
   fclose(fp);
+
+}*/
+
+void draw_bitmap(BITMAP *bitmap, int x, int y) {
+
+  int j;
+  word screen_offset  = (y << 8) + (y << 6) + x;
+  word bitmap_offset  = 0;
+
+  for( j=0; j<bitmap->height; j++ ) {
+
+    memcpy(&VGA[screen_offset], &bitmap->data[bitmap_offset], bitmap->width);
+
+    bitmap_offset += bitmap->width;
+    screen_offset += SCREEN_WIDTH;
+
+  }
 
 }
 
